@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicate File Finder</title>
+</head>
+<body>
+
+    <h1>Duplicate File Finder</h1>
+    
+    <label for="folderPath">Enter folder path:</label>
+    <input type="text" id="folderPath" placeholder="E.g., /path/to/folder">
+
+    <button onclick="findDuplicates()">Find Duplicates</button>
+
+    <div id="output"></div>
+
+    <script>
+        async function findDuplicates() {
+            const folderPath = document.getElementById('folderPath').value;
+
+            if (!folderPath) {
+                alert('Please enter a folder path.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/findDuplicates?folderPath=${encodeURIComponent(folderPath)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                } else {
+                    displayResults(data.duplicates);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function displayResults(duplicates) {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '';
+
+            if (duplicates.length === 0) {
+                outputDiv.innerHTML = 'No duplicates found.';
+            } else {
+                const heading = document.createElement('h2');
+                heading.textContent = 'Duplicates found:';
+                outputDiv.appendChild(heading);
+
+                const list = document.createElement('ul');
+
+                duplicates.forEach(filePath => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = filePath;
+                    list.appendChild(listItem);
+                });
+
+                outputDiv.appendChild(list);
+            }
+        }
+    </script>
+
+</body>
+</html>
